@@ -29,7 +29,7 @@ else:
     st.stop()
 
 # Initialisation du modèle de langage
-model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-pro')
 
 # Contexte (Prompt système) pour former l'IA en conseiller Banque Populaire
 SYSTEM_PROMPT = """
