@@ -87,7 +87,7 @@ with st.sidebar:
         if st.button("Analyser le document"):
             st.info("Analyse en cours...")
             try:
-               response = client.models.generate_content(
+                response = client.models.generate_content(
                     model='gemini-1.5-flash',
                     contents=f"Analyse ce document bancaire :\n{text_content}",
                     config=types.GenerateContentConfig(
