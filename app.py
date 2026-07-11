@@ -59,8 +59,8 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
+           response = client.models.generate_content(
+                model='gemini-1.5-flash',
                 contents=user_input,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT
@@ -87,8 +87,8 @@ with st.sidebar:
         if st.button("Analyser le document"):
             st.info("Analyse en cours...")
             try:
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+               response = client.models.generate_content(
+                    model='gemini-1.5-flash',
                     contents=f"Analyse ce document bancaire :\n{text_content}",
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT
