@@ -77,7 +77,6 @@ if user_input := st.chat_input("Posez votre question ici..."):
 with st.sidebar:
     st.header("📁 Analyse de Documents")
     st.write("Téléchargez un relevé de compte ou document (PDF)")
-    uploaded_file = st.file_uploader("Upload", type=["pdf"]) # <-- Ajoutez les espaces ici !
     
     if uploaded_file is not None:
         st.success("Fichier chargé avec succès !")
