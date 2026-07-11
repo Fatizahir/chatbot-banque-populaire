@@ -70,7 +70,8 @@ if user_input := st.chat_input("Posez votre question ici..."):
             st.write(response.text)
             st.session_state.messages.append({"role": "model", "parts": [response.text]})
         except Exception as e:
-            st.error("Une erreur est survenue lors de la communication avec l'IA.")
+           except Exception as e:
+               st.error(f"Détail de l'erreur : {str(e)}")
 
 # Barre latérale pour charger les fichiers PDF
 with st.sidebar:
