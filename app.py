@@ -59,9 +59,8 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            # Envoi simplifié pour le chat en 2026
             response = client.models.generate_content(
-                model='gemini-1.5-flash',
+                model='gemini-2.5-flash',
                 contents=user_input,
                 config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT
@@ -70,8 +69,7 @@ if user_input := st.chat_input("Posez votre question ici..."):
             st.write(response.text)
             st.session_state.messages.append({"role": "model", "parts": [response.text]})
         except Exception as e:
-           except Exception as e:
-               st.error(f"Détail de l'erreur : {str(e)}")
+            st.error(f"Détail de l'erreur : {str(e)}")
 
 # Barre latérale pour charger les fichiers PDF
 with st.sidebar:
@@ -90,7 +88,7 @@ with st.sidebar:
             st.info("Analyse en cours...")
             try:
                 response = client.models.generate_content(
-                    model='gemini-1.5-flash',
+                    model='gemini-2.5-flash',
                     contents=f"Analyse ce document bancaire :\n{text_content}",
                     config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT
@@ -98,4 +96,4 @@ with st.sidebar:
                 )
                 st.write(response.text)
             except Exception as e:
-                st.error("Erreur lors de l'analyse du document.")
+                st.error(f"Erreur lors de l'analyse : {str(e)}")
