@@ -59,7 +59,7 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-           response = client.models.generate_content(
+            response = client.models.generate_content(
                 model='gemini-1.5-flash',
                 contents=user_input,
                 config=types.GenerateContentConfig(
