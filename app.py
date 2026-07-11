@@ -74,6 +74,7 @@ if user_input := st.chat_input("Posez votre question ici..."):
         except Exception as e:
             st.error("Une erreur est survenue lors de la communication avec l'IA.")
 
+# Barre latérale pour charger les fichiers PDF
 with st.sidebar:
     st.header("📁 Analyse de Documents")
     st.write("Téléchargez un relevé de compte ou document (PDF)")
