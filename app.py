@@ -4,7 +4,7 @@
 for i, message in enumerate(st.session_state.messages):
     with st.chat_message(message["role"]):
         st.write(message["content"])
-
+from PyPDF2 import PdfReader
 # Entrée de l'utilisateur
 if user_input := st.chat_input("Posez votre question ici..."):
     # Afficher et enregistrer le message de l'utilisateur
