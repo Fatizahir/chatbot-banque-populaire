@@ -1,5 +1,6 @@
 import streamlit as st
 from google import genai
+from google.genai import types
 from pypdf import PdfReader
 
 # Configuration de la page Streamlit
@@ -29,7 +30,7 @@ if not api_key:
     st.error("Veuillez configurer votre clé API Gemini dans les secrets de Streamlit.")
     st.stop()
 
-# Initialisation du nouveau client officiel Google GenAI
+# Initialisation du client officiel Google GenAI
 client = genai.Client(api_key=api_key)
 
 # Prompt système
@@ -58,11 +59,11 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            # Appel avec la nouvelle syntaxe 2026
+            # Envoi simplifié pour le chat en 2026
             response = client.models.generate_content(
                 model='gemini-1.5-flash',
                 contents=user_input,
-                config=genai.types.GenerateContentConfig(
+                config=types.GenerateContentConfig(
                     system_instruction=SYSTEM_PROMPT
                 )
             )
@@ -90,7 +91,7 @@ with st.sidebar:
                 response = client.models.generate_content(
                     model='gemini-1.5-flash',
                     contents=f"Analyse ce document bancaire :\n{text_content}",
-                    config=genai.types.GenerateContentConfig(
+                    config=types.GenerateContentConfig(
                         system_instruction=SYSTEM_PROMPT
                     )
                 )
