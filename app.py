@@ -32,7 +32,7 @@ if not api_key:
 # Initialisation du client officiel Google GenAI
 client = genai.Client(api_key=api_key)
 
-# Prompt système incorporé directement dans l'envoi
+# Prompt système incorporé directement dans le texte
 SYSTEM_PROMPT = "Tu es l'assistant virtuel officiel de la Banque Populaire. Tu es courtois, professionnel et précis. Tu aides les clients sur les offres de comptes, simulations de crédit et explication des documents. Reste toujours dans ton rôle de conseiller bancaire."
 
 # Initialisation de l'historique
@@ -54,7 +54,7 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            # Syntaxe simplifiée 2026 qui évite les erreurs d'API v1beta
+            # Utilisation de l'identifiant de modèle standard universel
             response = client.models.generate_content(
                 model='gemini-2.5-flash',
                 contents=f"{SYSTEM_PROMPT}\n\nQuestion du client : {user_input}"
