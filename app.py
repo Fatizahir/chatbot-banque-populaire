@@ -30,7 +30,7 @@ if not api_key:
     st.error("Veuillez configurer votre clé API Gemini dans les secrets de Streamlit.")
     st.stop()
 
-# Initialisation du client officiel Google GenAI
+# Initialisation du client officiel Google GenAI avec mise en cache
 @st.cache_resource
 def get_genai_client(api_key):
     return genai.Client(api_key=api_key)
@@ -44,13 +44,13 @@ SYSTEM_PROMPT = (
     "Reste toujours dans ton rôle de conseiller bancaire."
 )
 
-# Initialisation de la session de chat Gemini pour conserver la mémoire
+# Initialisation de la session de chat Gemini pour conserver la mémoire (Résout l'erreur 404)
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(
-        model='gemini-1.5-flash',
+        model='gemini-2.5-flash',  # Utilisation du modèle stable et supporté par v1
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
-            temperature=0.3 # Plus bas pour des réponses bancaires plus factuelles et précises
+            temperature=0.3            # Température basse pour des réponses bancaires fiables
         )
     )
 
@@ -96,19 +96,18 @@ with st.sidebar:
             text_content += page.extract_text() + "\n"
             
         if st.button("Analyser le document"):
-            # Simulation visuelle dans le chat pour que l'utilisateur voit l'action
+            # Simulation visuelle dans le chat pour l'historique
             st.session_state.messages.append({"role": "user", "parts": ["[Document PDF envoyé pour analyse]"]})
             
             with st.chat_message("model"):
                 st.info("Analyse du document en cours...")
                 try:
-                    # On envoie le texte extrait au chat pour que l'IA puisse répondre à de futures questions dessus
+                    # Transmission du contenu du document directement dans le fil de discussion
                     prompt_analyse = f"Voici un document bancaire téléchargé par le client. Analyse-le et fais-en un résumé clair et professionnel :\n\n{text_content}"
                     response = st.session_state.chat_session.send_message(prompt_analyse)
                     
-                    # Remplacement du message d'information par la vraie réponse
-                    st.rerun() 
-                    st.write(response.text)
+                    # Mise à jour de l'historique de session et rafraîchissement de l'affichage
                     st.session_state.messages.append({"role": "model", "parts": [response.text]})
+                    st.rerun() 
                 except Exception as e:
                     st.error(f"Erreur lors de l'analyse : {str(e)}")
