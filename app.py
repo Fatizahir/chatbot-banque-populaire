@@ -54,9 +54,9 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            # Passage sur le modèle pro accessible
+            # Utilisation du modèle gratuit et accessible en 2026
             response = client.models.generate_content(
-                model='gemini-2.5-pro',
+                model='gemini-2.5-flash',
                 contents=f"{SYSTEM_PROMPT}\n\nQuestion du client : {user_input}"
             )
             st.write(response.text)
@@ -81,7 +81,7 @@ with st.sidebar:
             st.info("Analyse en cours...")
             try:
                 response = client.models.generate_content(
-                    model='gemini-2.5-pro',
+                    model='gemini-2.5-flash',
                     contents=f"{SYSTEM_PROMPT}\n\nAnalyse ce document bancaire :\n{text_content}"
                 )
                 st.write(response.text)
