@@ -1,6 +1,5 @@
 import streamlit as st
 from google import genai
-from google.genai import types
 from pypdf import PdfReader
 
 # Configuration de la page Streamlit
@@ -33,12 +32,8 @@ if not api_key:
 # Initialisation du client officiel Google GenAI
 client = genai.Client(api_key=api_key)
 
-# Prompt système
-SYSTEM_PROMPT = """
-Tu es l'assistant virtuel officiel de la Banque Populaire. Tu es courtois, professionnel et précis.
-Tu aides les clients sur les offres de comptes, simulations de crédit et explication des documents.
-Reste toujours dans ton rôle de conseiller bancaire.
-"""
+# Prompt système incorporé directement dans l'envoi
+SYSTEM_PROMPT = "Tu es l'assistant virtuel officiel de la Banque Populaire. Tu es courtois, professionnel et précis. Tu aides les clients sur les offres de comptes, simulations de crédit et explication des documents. Reste toujours dans ton rôle de conseiller bancaire."
 
 # Initialisation de l'historique
 if "messages" not in st.session_state:
@@ -59,12 +54,10 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
+            # Syntaxe simplifiée 2026 qui évite les erreurs d'API v1beta
             response = client.models.generate_content(
-                model='gemini-1.5-flash',
-                contents=user_input,
-                config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT
-                )
+                model='gemini-2.5-flash',
+                contents=f"{SYSTEM_PROMPT}\n\nQuestion du client : {user_input}"
             )
             st.write(response.text)
             st.session_state.messages.append({"role": "model", "parts": [response.text]})
@@ -88,11 +81,8 @@ with st.sidebar:
             st.info("Analyse en cours...")
             try:
                 response = client.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=f"Analyse ce document bancaire :\n{text_content}",
-                    config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_PROMPT
-                    )
+                    model='gemini-2.5-flash',
+                    contents=f"{SYSTEM_PROMPT}\n\nAnalyse ce document bancaire :\n{text_content}"
                 )
                 st.write(response.text)
             except Exception as e:
