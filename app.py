@@ -1,5 +1,6 @@
 import streamlit as st
 from google import genai
+from google.genai import types
 from pypdf import PdfReader
 
 # Configuration de la page Streamlit
@@ -30,23 +31,41 @@ if not api_key:
     st.stop()
 
 # Initialisation du client officiel Google GenAI
-client = genai.Client(api_key=api_key)
+@st.cache_resource
+def get_genai_client(api_key):
+    return genai.Client(api_key=api_key)
 
-# Prompt système incorporé directement dans le texte
-SYSTEM_PROMPT = "Tu es l'assistant virtuel officiel de la Banque Populaire. Tu es courtois, professionnel et précis. Tu aides les clients sur les offres de comptes, simulations de crédit et explication des documents. Reste toujours dans ton rôle de conseiller bancaire."
+client = get_genai_client(api_key)
 
-# Initialisation de l'historique
+# Prompt système officiel
+SYSTEM_PROMPT = (
+    "Tu es l'assistant virtuel officiel de la Banque Populaire. Tu es courtois, professionnel et précis. "
+    "Tu aides les clients sur les offres de comptes, simulations de crédit et explication des documents. "
+    "Reste toujours dans ton rôle de conseiller bancaire."
+)
+
+# Initialisation de la session de chat Gemini pour conserver la mémoire
+if "chat_session" not in st.session_state:
+    st.session_state.chat_session = client.chats.create(
+        model='gemini-1.5-flash',
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=0.3 # Plus bas pour des réponses bancaires plus factuelles et précises
+        )
+    )
+
+# Initialisation de l'historique d'affichage Streamlit
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "model", "parts": ["Bonjour ! Comment puis-je vous aider aujourd'hui concernant vos services Banque Populaire ?"]}
     ]
 
-# Affichage de l'historique
+# Affichage de l'historique de discussion
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["parts"][0])
 
-# Zone de saisie utilisateur
+# Zone de saisie utilisateur (Chat classique)
 if user_input := st.chat_input("Posez votre question ici..."):
     st.session_state.messages.append({"role": "user", "parts": [user_input]})
     with st.chat_message("user"):
@@ -54,11 +73,8 @@ if user_input := st.chat_input("Posez votre question ici..."):
         
     with st.chat_message("model"):
         try:
-            # Utilisation du modèle gratuit et accessible en 2026
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=f"{SYSTEM_PROMPT}\n\nQuestion du client : {user_input}"
-            )
+            # Envoi du message dans la session de chat active
+            response = st.session_state.chat_session.send_message(user_input)
             st.write(response.text)
             st.session_state.messages.append({"role": "model", "parts": [response.text]})
         except Exception as e:
@@ -72,18 +88,27 @@ with st.sidebar:
     
     if uploaded_file is not None:
         st.success("Fichier chargé avec succès !")
+        
+        # Extraction du texte du PDF
         reader = PdfReader(uploaded_file)
         text_content = ""
         for page in reader.pages:
-            text_content += page.extract_text()
+            text_content += page.extract_text() + "\n"
             
         if st.button("Analyser le document"):
-            st.info("Analyse en cours...")
-            try:
-                response = client.models.generate_content(
-                    model='gemini-2.5-flash',
-                    contents=f"{SYSTEM_PROMPT}\n\nAnalyse ce document bancaire :\n{text_content}"
-                )
-                st.write(response.text)
-            except Exception as e:
-                st.error(f"Erreur lors de l'analyse : {str(e)}")
+            # Simulation visuelle dans le chat pour que l'utilisateur voit l'action
+            st.session_state.messages.append({"role": "user", "parts": ["[Document PDF envoyé pour analyse]"]})
+            
+            with st.chat_message("model"):
+                st.info("Analyse du document en cours...")
+                try:
+                    # On envoie le texte extrait au chat pour que l'IA puisse répondre à de futures questions dessus
+                    prompt_analyse = f"Voici un document bancaire téléchargé par le client. Analyse-le et fais-en un résumé clair et professionnel :\n\n{text_content}"
+                    response = st.session_state.chat_session.send_message(prompt_analyse)
+                    
+                    # Remplacement du message d'information par la vraie réponse
+                    st.rerun() 
+                    st.write(response.text)
+                    st.session_state.messages.append({"role": "model", "parts": [response.text]})
+                except Exception as e:
+                    st.error(f"Erreur lors de l'analyse : {str(e)}")
