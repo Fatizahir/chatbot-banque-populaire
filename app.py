@@ -44,13 +44,13 @@ SYSTEM_PROMPT = (
     "Reste toujours dans ton rôle de conseiller bancaire."
 )
 
-# Initialisation de la session de chat Gemini pour conserver la mémoire (Résout l'erreur 404)
+# Initialisation de la session de chat Gemini avec le modèle à jour (gemini-2.0-flash)
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(
-        model='gemini-2.5-flash',  # Utilisation du modèle stable et supporté par v1
+        model='gemini-2.0-flash',  # Modèle actuel recommandé et supporté par le SDK google-genai
         config=types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
-            temperature=0.3            # Température basse pour des réponses bancaires fiables
+            temperature=0.3            # Température basse pour garantir la rigueur des réponses bancaires
         )
     )
 
